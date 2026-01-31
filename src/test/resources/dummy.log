@@ -1,0 +1,4 @@
+2023-10-27 10:00:00 INFO Starting application
+2023-10-27 10:00:01 ERROR Connection refused to database
+2023-10-27 10:00:02 WARN Retrying connection
+2023-10-27 10:00:03 ERROR NullPointerException at com.example.Service.process(Service.java:25)
