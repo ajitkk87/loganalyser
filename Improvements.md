@@ -2,8 +2,8 @@
 1. Package rename from OMaaP to more generic like example-Ajit
 2. Connection properties for elastic logs commented out.
 3. Prompt Improvements with Limit of one day logs and type of logs(e.g. Error ) as Error only.
-   Option to limit per applications such as PDA. Add Integration Tests.
-4. Prompt to attach the logs to summarize the logs analysis.
+   Option to limit per applications such as PDA. Add Integration Tests. -Ajit
+4. Prompt to attach the logs to summarize the logs analysis. 
 5. Review code with ChatGPT/CoPilot for prompts.
 
 # Future Enhancements

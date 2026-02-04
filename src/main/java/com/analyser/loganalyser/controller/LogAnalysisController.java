@@ -18,19 +18,32 @@ public class LogAnalysisController {
     /**
      * Analyze raw log text sent in the request body
      */
-    @PostMapping("/analyze-raw")
-    public ResponseEntity<String> analyzeRaw(@RequestBody String logData) {
-        String analysis = logService.processLogs(logData);
+    @PostMapping("/search-and-analyze-env")
+    public ResponseEntity<String> searchAndAnalyzeEnv(
+            @RequestParam(defaultValue = "TST") String env,
+            @RequestParam(defaultValue = "Find critical errors") String query,
+            @RequestParam(required = false) String repoLink,
+            @RequestParam(required = false) String logLevel,
+            @RequestParam(required = false) Integer days,
+            @RequestParam(required = false) String applicationName) {
+        // Assuming your service has a method to search the vector store
+        String analysis = logService.processLogs(env, query, repoLink, logLevel, days, applicationName);
         return ResponseEntity.ok(analysis);
     }
 
     /**
      * Search and analyze logs from ELK/VectorStore based on a query
      */
-    @GetMapping("/search-and-analyze")
-    public ResponseEntity<String> searchAndAnalyze(@RequestParam(defaultValue = "Find critical errors") String query) {
+    @PostMapping("/search-and-analyze-raw")
+    public ResponseEntity<String> searchAndAnalyzeRaw(
+            @RequestBody String logData,
+            @RequestParam(defaultValue = "Find critical errors") String query,
+            @RequestParam(required = false) String repoLink,
+            @RequestParam(required = false) String logLevel,
+            @RequestParam(required = false) Integer days,
+            @RequestParam(required = false) String applicationName) {
         // Assuming your service has a method to search the vector store
-        String analysis = logService.processLogs(query);
+        String analysis = logService.processLogs(logData, query, repoLink, logLevel, days, applicationName);
         return ResponseEntity.ok(analysis);
     }
 }
