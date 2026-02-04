@@ -2,8 +2,16 @@ spring:
   application:
     name: loganalyser
   ai:
+    # preferred provider for ChatModel selection in AiConfig: 'ollama' or 'google'
+    provider: ollama
     ollama:
       base-url: http://localhost:11434
       chat:
         options:
           model: gemma:2b
+    google:
+          genai: 
+            api-key: Your_Google_API_Key_Here
+          chat:
+            options:
+              model: gemini-1.5-flash  

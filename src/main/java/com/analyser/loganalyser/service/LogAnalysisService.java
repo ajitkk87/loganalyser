@@ -1,19 +1,42 @@
 package com.analyser.loganalyser.service;
 
-import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ClassPathResource;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class LogAnalysisService {
 
     private static final int MAX_LOG_LENGTH = 1_000_000;
     private static final int MAX_QUERY_LENGTH = 100_000;
+    private static final String OUTPUT_DIR = "log_analysis_output";
+    
+    private static final String GUARDRAILS_FILE = "guardrails.st";
 
-    private final OllamaChatModel chatModel;
+    private final ChatModel chatModel;
+    private final String guardrailsContent;
 
     // The starter automatically creates this bean from your yaml settings
-    public LogAnalysisService(OllamaChatModel chatModel) {
+    public LogAnalysisService(ChatModel chatModel) {
         this.chatModel = chatModel;
+        String loaded = "";
+        try {
+            ClassPathResource resource = new ClassPathResource(GUARDRAILS_FILE);
+            try (InputStream in = resource.getInputStream()) {
+                loaded = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) {
+            System.err.println("Warning: could not load guardrails file: " + e.getMessage());
+        }
+        this.guardrailsContent = loaded;
     }
 
     public String processLogs(String rawLogs) {
@@ -80,7 +103,22 @@ public class LogAnalysisService {
         prompt.append(". Provide the output in a consistent tabular format with the following columns: Exception, Impacted Class, Details of Exception, Remediation of Code.");
 
         prompt.append(": ").append(logsToProcess);
-        return chatModel.call(prompt.toString());
+        
+
+        // Prepend guardrails content (if available) as system-like instructions
+        /*
+        if (guardrailsContent != null && !guardrailsContent.isEmpty()) {
+            prompt.append("[GUARDRAILS]\n" + guardrailsContent + "\n\n");
+        }
+        */ 
+
+        // Call chat model with combined prompt
+        String result = this.chatModel.call(prompt.toString());
+        
+        // Save output to file
+        saveOutputToFile(result);
+        
+        return result;
     }
 
     /**
@@ -113,5 +151,34 @@ public class LogAnalysisService {
         mockLogs.append("2024-01-01 10:10:00 WARN: Deprecated API usage detected.");
 
         return mockLogs.toString();
+    }
+
+    /**
+     * Saves the chatModel output to a file with a timestamp.
+     * Files are saved in the log_analysis_output directory.
+     */
+    private void saveOutputToFile(String output) {
+        try {
+            // Create output directory if it doesn't exist
+            Files.createDirectories(Paths.get(OUTPUT_DIR));
+
+            // Generate timestamp-based filename
+            LocalDateTime now = LocalDateTime.now();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
+            String fileName = String.format("%s/analysis_%s.txt", OUTPUT_DIR, now.format(formatter));
+
+            // Write output to file
+            try (FileWriter writer = new FileWriter(fileName)) {
+                writer.write("Log Analysis Output\n");
+                writer.write("Generated at: " + now + "\n");
+                writer.write("=".repeat(80) + "\n\n");
+                writer.write(output);
+            }
+
+            System.out.println("Analysis output saved to: " + fileName);
+        } catch (IOException e) {
+            System.err.println("Error saving output to file: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

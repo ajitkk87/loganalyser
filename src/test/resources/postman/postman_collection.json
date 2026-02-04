@@ -1,0 +1,202 @@
+{
+  "info": {
+    "_postman_id": "loganalyser-collection",
+    "name": "Log Analyzer API",
+    "description": "Collection for testing Log Analyzer endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Environment Analysis",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/logs/search-and-analyze-env?env=TST&query=Find critical errors&logLevel=ERROR&days=7&applicationName=user-service&repoLink=https://github.com/example/myapp",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "logs",
+            "search-and-analyze-env"
+          ],
+          "query": [
+            {
+              "key": "env",
+              "value": "TST",
+              "disabled": false
+            },
+            {
+              "key": "query",
+              "value": "Find critical errors",
+              "disabled": false
+            },
+            {
+              "key": "logLevel",
+              "value": "ERROR",
+              "disabled": false
+            },
+            {
+              "key": "days",
+              "value": "7",
+              "disabled": false
+            },
+            {
+              "key": "applicationName",
+              "value": "user-service",
+              "disabled": false
+            },
+            {
+              "key": "repoLink",
+              "value": "https://github.com/example/myapp",
+              "disabled": false
+            }
+          ]
+        },
+        "description": "Analyze logs from a specific environment with various filters"
+      },
+      "response": []
+    },
+    {
+      "name": "Raw Logs Analysis",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "2024-01-01 10:00:00 INFO: Application startup successful.\n2024-01-01 10:05:00 ERROR: NullPointerException at com.example.UserService.getUser(UserService.java:101)\njava.lang.NullPointerException\n    at com.example.UserService.getUser(UserService.java:101)\n    at com.example.UserController.getUserDetails(UserController.java:45)\n    at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)\n2024-01-01 10:06:00 ERROR: SQLException: Connection timeout\njava.sql.SQLException: Connection timeout to database\n    at com.example.database.ConnectionPool.getConnection(ConnectionPool.java:234)\n2024-01-01 10:10:00 WARN: Deprecated API usage detected in LoginService\n2024-01-01 10:15:00 ERROR: OutOfMemoryError: Java heap space\njava.lang.OutOfMemoryError: Java heap space\n    at java.util.HashMap.resize(HashMap.java:707)\n    at com.example.cache.CacheManager.put(CacheManager.java:156)\n2024-01-01 10:20:00 INFO: Application gracefully shutdown."
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/logs/search-and-analyze-raw?query=Find critical errors&logLevel=ERROR&days=1&applicationName=user-service&repoLink=https://github.com/example/myapp",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "logs",
+            "search-and-analyze-raw"
+          ],
+          "query": [
+            {
+              "key": "query",
+              "value": "Find critical errors",
+              "disabled": false
+            },
+            {
+              "key": "logLevel",
+              "value": "ERROR",
+              "disabled": false
+            },
+            {
+              "key": "days",
+              "value": "1",
+              "disabled": false
+            },
+            {
+              "key": "applicationName",
+              "value": "user-service",
+              "disabled": false
+            },
+            {
+              "key": "repoLink",
+              "value": "https://github.com/example/myapp",
+              "disabled": false
+            }
+          ]
+        },
+        "description": "Analyze raw log data sent in request body with filters"
+      },
+      "response": []
+    },
+    {
+      "name": "Raw Logs Analysis - Minimal (Defaults)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "text/plain"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "2024-01-01 10:00:00 INFO: Application startup successful.\n2024-01-01 10:05:00 ERROR: NullPointerException at com.example.UserService.getUser(UserService.java:101)"
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/logs/search-and-analyze-raw",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "logs",
+            "search-and-analyze-raw"
+          ]
+        },
+        "description": "Analyze raw logs using default query parameters"
+      },
+      "response": []
+    },
+    {
+      "name": "Environment Analysis - Minimal (Defaults)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/x-www-form-urlencoded"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/logs/search-and-analyze-env",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "logs",
+            "search-and-analyze-env"
+          ]
+        },
+        "description": "Analyze logs from environment using default parameters"
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "env",
+      "value": "TST",
+      "type": "string"
+    },
+    {
+      "key": "query",
+      "value": "Find critical errors",
+      "type": "string"
+    }
+  ]
+}

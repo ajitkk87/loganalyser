@@ -6,7 +6,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.ai.chat.model.ChatModel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
 class LogAnalysisServiceTest {
 
     @Mock
-    private OllamaChatModel chatModel;
+    private ChatModel chatModel;
 
     @InjectMocks
     private LogAnalysisService logAnalysisService;
