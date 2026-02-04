@@ -1,5 +1,5 @@
 # MVP
-1. Package rename from OMaaP to more generic like example
+1. Package rename from OMaaP to more generic like example-Ajit
 2. Connection properties for elastic logs commented out.
 3. Prompt Improvements with Limit of one day logs and type of logs(e.g. Error ) as Error only.
    Option to limit per applications such as PDA. Add Integration Tests.
