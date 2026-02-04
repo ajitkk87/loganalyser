@@ -1,4 +1,4 @@
-package com.omaap.loganalyser.service;
+package com.analyser.loganalyser.service;
 
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.stereotype.Service;

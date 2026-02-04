@@ -1,4 +1,4 @@
-package com.omaap.loganalyser.service;
+package com.analyser.loganalyser.service;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

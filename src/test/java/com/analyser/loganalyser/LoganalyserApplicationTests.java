@@ -1,4 +1,4 @@
-package com.omaap.loganalyser;
+package com.analyser.loganalyser;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

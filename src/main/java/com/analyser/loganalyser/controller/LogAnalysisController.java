@@ -1,6 +1,6 @@
-package com.omaap.loganalyser.controller;
+package com.analyser.loganalyser.controller;
 
-import com.omaap.loganalyser.service.LogAnalysisService;
+import com.analyser.loganalyser.service.LogAnalysisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
