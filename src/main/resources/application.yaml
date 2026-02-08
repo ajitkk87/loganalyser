@@ -2,16 +2,41 @@ spring:
   application:
     name: loganalyser
   ai:
-    # preferred provider for ChatModel selection in AiConfig: 'ollama' or 'google'
-    provider: ollama
+    # preferred provider for ChatModel selection in AiConfig: 'ollama', 'google' or 'openai'
+    provider: openai
     ollama:
       base-url: http://localhost:11434
       chat:
         options:
           model: gemma:2b
     google:
-          genai: 
-            api-key: Your_Google_API_Key_Here
-          chat:
-            options:
-              model: gemini-1.5-flash  
+      genai:
+        api-key: ${GOOGLE_API_KEY}
+      chat:
+        options:
+          model: gemini-1.5-flash
+    openai:
+      api-key: ${OPEN_API_KEY}
+      base-url: https://aicafe.hcl.com/AICafeService/api/v1/subscription
+      chat:
+        enabled: true
+        completions-path: /openai/deployments/gpt-4.1/chat/completions?api-version=2024-12-01-preview
+        options:
+          model: gpt-4.1
+          http-headers:
+            api-key: ${OPEN_API_KEY}
+      retry:
+        max-attempts: 3
+      hcl:
+        cafe:
+          api-key: ${OPEN_API_KEY}
+          endpoint: https://aicafe.hcl.com/AICafeService/api/v1/subscription/openai/deployments/
+          api-version: 2024-12-01-preview
+          model: gpt-4.1
+
+log:
+  env-urls:
+    dev: "http://dev-logs.example.com"
+    test: "http://test-logs.example.com"
+    acc: "http://acc-logs.example.com"
+    prd: "http://prd-logs.example.com"

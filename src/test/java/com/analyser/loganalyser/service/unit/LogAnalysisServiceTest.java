@@ -1,5 +1,7 @@
-package com.analyser.loganalyser.service;
+package com.analyser.loganalyser.service.unit;
 
+import com.analyser.loganalyser.config.LogProperties;
+import com.analyser.loganalyser.service.LogAnalysisService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -7,6 +9,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ChatModel;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,6 +23,9 @@ class LogAnalysisServiceTest {
 
     @Mock
     private ChatModel chatModel;
+
+    @Mock
+    private LogProperties logProperties;
 
     @InjectMocks
     private LogAnalysisService logAnalysisService;
@@ -65,6 +72,7 @@ class LogAnalysisServiceTest {
         // Given
         String env = "PROD";
         String expectedResponse = "Analysis of PROD logs.";
+        when(logProperties.getEnvUrls()).thenReturn(Map.of("PROD", "http://prod.example.com"));
         when(chatModel.call(anyString())).thenReturn(expectedResponse);
 
         // When
@@ -86,6 +94,7 @@ class LogAnalysisServiceTest {
         String appName = "UserService";
         int days = 3;
         String expectedResponse = "Analysis of filtered PROD logs.";
+        when(logProperties.getEnvUrls()).thenReturn(Map.of("PROD", "http://prod.example.com"));
         when(chatModel.call(anyString())).thenReturn(expectedResponse);
 
         // When

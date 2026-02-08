@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
+import org.springframework.ai.openai.OpenAiChatModel;
 
 @Configuration
 public class AiConfig {
@@ -24,6 +25,7 @@ public class AiConfig {
      * <ol>
      *   <li>If {@code ai.provider=google} and Google GenAI is available, return that.</li>
      *   <li>If {@code ai.provider=ollama} and Ollama is available, return that.</li>
+     *   <li>If {@code ai.provider=openai} and OpenAI is available, return that.</li>
      *   <li>If {@code ai.provider} has an unsupported value, throw {@link IllegalStateException}.</li>
      *   <li>If the selected provider is unavailable or unconfigured, throw {@link IllegalStateException}.</li>
      * </ol>
@@ -31,6 +33,7 @@ public class AiConfig {
      * @param env the Spring Environment used to read {@code ai.provider}
      * @param googleProvider optional provider for {@link GoogleGenAiChatModel}
      * @param ollamaProvider optional provider for {@link org.springframework.ai.ollama.OllamaChatModel}
+     * @param openaiProvider optional provider for {@link OpenAiChatModel}
      * @return the selected {@link ChatModel} implementation
      * @throws IllegalStateException if provider is invalid or unavailable
      */
@@ -38,7 +41,8 @@ public class AiConfig {
     @Primary
     public ChatModel chatModel(Environment env,
                               ObjectProvider<GoogleGenAiChatModel> googleProvider,
-                              ObjectProvider<org.springframework.ai.ollama.OllamaChatModel> ollamaProvider) {
+                              ObjectProvider<org.springframework.ai.ollama.OllamaChatModel> ollamaProvider,
+                              ObjectProvider<OpenAiChatModel> openaiProvider) {
         String providerPref = env.getProperty("ai.provider", "ollama");
 
         if ("google".equalsIgnoreCase(providerPref)) {
@@ -51,8 +55,13 @@ public class AiConfig {
             if (o != null) {
                 return o;
             }
+        } else if ("openai".equalsIgnoreCase(providerPref)) {
+            OpenAiChatModel oa = openaiProvider.getIfAvailable();
+            if (oa != null) {
+                return oa;
+            }
         } else {
-            throw new IllegalStateException("Invalid ai.provider: '" + providerPref + "'. Supported values: 'google', 'ollama'");
+            throw new IllegalStateException("Invalid ai.provider: '" + providerPref + "'. Supported values: 'google', 'ollama', 'openai'");
         }
 
         throw new IllegalStateException("ChatModel '" + providerPref + "' is not available. Ensure the corresponding starter is on the classpath and properties are configured.");
