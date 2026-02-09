@@ -8,37 +8,38 @@ import java.util.concurrent.TimeUnit;
 
 public class LogStreamGenerator {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final Random RANDOM = new Random();
 
-    private static final List<String> INFO_MESSAGES = List.of(
-            "Starting application",
-            "User logged in",
-            "Request processed successfully",
-            "Cache refreshed",
-            "Health check passed",
-            "Scheduled task executed",
-            "Data sync completed"
-    );
+    private static final List<String> INFO_MESSAGES =
+            List.of(
+                    "Starting application",
+                    "User logged in",
+                    "Request processed successfully",
+                    "Cache refreshed",
+                    "Health check passed",
+                    "Scheduled task executed",
+                    "Data sync completed");
 
-    private static final List<String> WARN_MESSAGES = List.of(
-            "Retrying connection - com.example.network.ConnectionManager",
-            "High memory usage detected - com.example.monitor.ResourceMonitor",
-            "Response time > 500ms - com.example.api.RequestFilter",
-            "Deprecated API usage - com.example.legacy.LegacyService",
-            "Disk space running low - com.example.system.DiskMonitor",
-            "Connection pool nearing limit - com.zaxxer.hikari.HikariPool"
-    );
+    private static final List<String> WARN_MESSAGES =
+            List.of(
+                    "Retrying connection - com.example.network.ConnectionManager",
+                    "High memory usage detected - com.example.monitor.ResourceMonitor",
+                    "Response time > 500ms - com.example.api.RequestFilter",
+                    "Deprecated API usage - com.example.legacy.LegacyService",
+                    "Disk space running low - com.example.system.DiskMonitor",
+                    "Connection pool nearing limit - com.zaxxer.hikari.HikariPool");
 
-    private static final List<String> ERROR_MESSAGES = List.of(
-            "Connection refused to database - java.net.ConnectException",
-            "NullPointerException at com.example.Service.process(Service.java:25) - java.lang.NullPointerException",
-            "Timeout waiting for upstream service - java.util.concurrent.TimeoutException",
-            "Failed to write to file system - java.io.IOException",
-            "Payment gateway unavailable - com.example.payment.GatewayException",
-            "Transaction rollback failed - org.springframework.transaction.TransactionSystemException",
-            "OutOfMemoryError: Java heap space - java.lang.OutOfMemoryError"
-    );
+    private static final List<String> ERROR_MESSAGES =
+            List.of(
+                    "Connection refused to database - java.net.ConnectException",
+                    "NullPointerException at com.example.Service.process(Service.java:25) - java.lang.NullPointerException",
+                    "Timeout waiting for upstream service - java.util.concurrent.TimeoutException",
+                    "Failed to write to file system - java.io.IOException",
+                    "Payment gateway unavailable - com.example.payment.GatewayException",
+                    "Transaction rollback failed - org.springframework.transaction.TransactionSystemException",
+                    "OutOfMemoryError: Java heap space - java.lang.OutOfMemoryError");
 
     public static void main(String[] args) {
         System.out.println("Generating log stream... Press Ctrl+C to stop.");

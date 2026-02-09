@@ -1,11 +1,6 @@
 package com.analyser.loganalyser.service;
 
 import com.analyser.loganalyser.config.LogProperties;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.stereotype.Service;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.web.client.RestTemplate;
-
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +10,10 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 public class LogAnalysisService {
@@ -77,26 +76,42 @@ public class LogAnalysisService {
         return processLogs(rawLogs, query, repoLink, logLevel, null, null, null);
     }
 
-    public String processLogs(String rawLogs, String query, String repoLink, String logLevel, Integer days) {
+    public String processLogs(
+            String rawLogs, String query, String repoLink, String logLevel, Integer days) {
         return processLogs(rawLogs, query, repoLink, logLevel, days, null, null);
     }
 
-    public String processLogs(String rawLogs, String query, String repoLink, String logLevel, Integer days, String applicationName) {
+    public String processLogs(
+            String rawLogs,
+            String query,
+            String repoLink,
+            String logLevel,
+            Integer days,
+            String applicationName) {
         return processLogs(rawLogs, query, repoLink, logLevel, days, applicationName, null);
     }
 
-    public String processLogs(String rawLogs, String query, String repoLink, String logLevel, Integer days, String applicationName, String env) {
+    public String processLogs(
+            String rawLogs,
+            String query,
+            String repoLink,
+            String logLevel,
+            Integer days,
+            String applicationName,
+            String env) {
         String logsToProcess = rawLogs;
         if (env != null && !env.trim().isEmpty()) {
             logsToProcess = fetchLogsFromEnv(env, days, logLevel, applicationName);
         }
 
         if (logsToProcess != null && logsToProcess.length() > MAX_LOG_LENGTH) {
-            throw new IllegalArgumentException("Raw logs length exceeds the limit of " + MAX_LOG_LENGTH + " characters.");
+            throw new IllegalArgumentException(
+                    "Raw logs length exceeds the limit of " + MAX_LOG_LENGTH + " characters.");
         }
 
         if (query != null && query.length() > MAX_QUERY_LENGTH) {
-            throw new IllegalArgumentException("Query length exceeds the limit of " + MAX_QUERY_LENGTH + " characters.");
+            throw new IllegalArgumentException(
+                    "Query length exceeds the limit of " + MAX_QUERY_LENGTH + " characters.");
         }
 
         StringBuilder prompt = new StringBuilder();
@@ -105,12 +120,16 @@ public class LogAnalysisService {
         }
 
         if (logLevel != null && !logLevel.trim().isEmpty() && !"All".equalsIgnoreCase(logLevel)) {
-            prompt.append("Analyze these logs focusing on ").append(logLevel).append(" level entries");
+            prompt.append("Analyze these logs focusing on ")
+                    .append(logLevel)
+                    .append(" level entries");
         } else {
             prompt.append("Identify errors in these logs");
         }
 
-        if (applicationName != null && !applicationName.trim().isEmpty() && !"All".equalsIgnoreCase(applicationName)) {
+        if (applicationName != null
+                && !applicationName.trim().isEmpty()
+                && !"All".equalsIgnoreCase(applicationName)) {
             prompt.append(" for application ").append(applicationName);
         }
 
@@ -121,10 +140,10 @@ public class LogAnalysisService {
         if (repoLink != null && !repoLink.trim().isEmpty()) {
             prompt.append(". Context repository: ").append(repoLink);
         }
-        prompt.append("Avoid duplicate errors and Provide the output in a consistent tabular format with the following columns: Exception, Impacted Class, Details of Exception, Remediation of Code.");
+        prompt.append(
+                "Avoid duplicate errors and Provide the output in a consistent tabular format with the following columns: Exception, Impacted Class, Details of Exception, Remediation of Code.");
 
         prompt.append(": ").append(logsToProcess);
-
 
         // Prepend guardrails content (if available) as system-like instructions
         /*
@@ -144,7 +163,8 @@ public class LogAnalysisService {
             StringBuilder emailPrompt = new StringBuilder();
             emailPrompt.append("Use the following email template for the alert:\n");
             emailPrompt.append(emailTemplateContent).append("\n\n");
-            emailPrompt.append("Fill in the placeholders {applicationName}, {environment}, {date}, and {errorDetails} based on the logs analyzed.\n\n");
+            emailPrompt.append(
+                    "Fill in the placeholders {applicationName}, {environment}, {date}, and {errorDetails} based on the logs analyzed.\n\n");
             emailPrompt.append("Analysis Result:\n").append(result);
             // Call chat model with combined prompt
             String emailResult = this.chatModel.call(emailPrompt.toString());
@@ -155,8 +175,8 @@ public class LogAnalysisService {
     }
 
     /**
-     * Sends an email alert with the analysis results.
-     * In a real application, use Spring's JavaMailSender.
+     * Sends an email alert with the analysis results. In a real application, use Spring's
+     * JavaMailSender.
      */
     private void sendEmailAlert(String subject, String body) {
         System.out.println("Sending email alert...");
@@ -172,7 +192,8 @@ public class LogAnalysisService {
             Files.createDirectories(Paths.get(EMAIL_OUTPUT_DIR + "/email"));
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
-            String emailFileName = String.format("%s/email/email_%s.txt", EMAIL_OUTPUT_DIR, now.format(formatter));
+            String emailFileName =
+                    String.format("%s/email/email_%s.txt", EMAIL_OUTPUT_DIR, now.format(formatter));
 
             try (FileWriter writer = new FileWriter(emailFileName)) {
                 writer.write("Subject: " + subject + "\n");
@@ -186,10 +207,12 @@ public class LogAnalysisService {
     }
 
     /**
-     * Mock implementation to fetch logs from a specified environment.
-     * In a real application, this would connect to a log management system like ELK, Splunk, or a cloud provider's logging service.
+     * Mock implementation to fetch logs from a specified environment. In a real application, this
+     * would connect to a log management system like ELK, Splunk, or a cloud provider's logging
+     * service.
      */
-    private String fetchLogsFromEnv(String env, Integer days, String logLevel, String applicationName) {
+    private String fetchLogsFromEnv(
+            String env, Integer days, String logLevel, String applicationName) {
         StringBuilder mockLogs = new StringBuilder();
         mockLogs.append("Fetching logs from '").append(env).append("' environment");
 
@@ -199,7 +222,9 @@ public class LogAnalysisService {
             mockLogs.append(" for the last 1 days");
         }
 
-        if (applicationName != null && !applicationName.trim().isEmpty() && !"All".equalsIgnoreCase(applicationName)) {
+        if (applicationName != null
+                && !applicationName.trim().isEmpty()
+                && !"All".equalsIgnoreCase(applicationName)) {
             mockLogs.append(" for application '").append(applicationName).append("'");
         }
 
@@ -212,25 +237,31 @@ public class LogAnalysisService {
         Map<String, String> envUrls = logProperties.getEnvUrls();
         if (envUrls != null && envUrls.containsKey(env)) {
             String baseUrl = envUrls.get(env);
-            String url = String.format("%s/api/logs?days=%d&level=%s&app=%s", baseUrl, days != null ? days : 1, logLevel, applicationName);
+            String url =
+                    String.format(
+                            "%s/api/logs?days=%d&level=%s&app=%s",
+                            baseUrl, days != null ? days : 1, logLevel, applicationName);
             try {
-                //return restTemplate.getForObject(url, String.class);
+                // return restTemplate.getForObject(url, String.class);
             } catch (Exception e) {
-                mockLogs.append("Error fetching from remote URL: ").append(e.getMessage()).append("\n");
+                mockLogs.append("Error fetching from remote URL: ")
+                        .append(e.getMessage())
+                        .append("\n");
             }
         }
 
         // Mock log data for demonstration purposes
         mockLogs.append("2024-01-01 10:00:00 INFO: Application startup successful.\n");
-        mockLogs.append("2024-01-01 10:05:00 ERROR: NullPointerException at com.example.UserService.getUser(UserService.java:101)\n");
+        mockLogs.append(
+                "2024-01-01 10:05:00 ERROR: NullPointerException at com.example.UserService.getUser(UserService.java:101)\n");
         mockLogs.append("2024-01-01 10:10:00 WARN: Deprecated API usage detected.");
 
         return mockLogs.toString();
     }
 
     /**
-     * Saves the chatModel output to a file with a timestamp.
-     * Files are saved in the log_analysis_output directory.
+     * Saves the chatModel output to a file with a timestamp. Files are saved in the
+     * log_analysis_output directory.
      */
     private void saveOutputToFile(String output) {
         try {
@@ -240,7 +271,8 @@ public class LogAnalysisService {
             // Generate timestamp-based filename
             LocalDateTime now = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss-SSS");
-            String fileName = String.format("%s/analysis_%s.txt", LOG_OUTPUT_DIR, now.format(formatter));
+            String fileName =
+                    String.format("%s/analysis_%s.txt", LOG_OUTPUT_DIR, now.format(formatter));
 
             // Write output to file
             try (FileWriter writer = new FileWriter(fileName)) {

@@ -15,9 +15,7 @@ public class LogAnalysisController {
         this.logService = logService;
     }
 
-    /**
-     * Analyze raw log text sent in the request body
-     */
+    /** Analyze raw log text sent in the request body */
     @PostMapping("/search-and-analyze-env")
     public ResponseEntity<String> searchAndAnalyzeEnv(
             @RequestParam(defaultValue = "TST") String env,
@@ -27,13 +25,12 @@ public class LogAnalysisController {
             @RequestParam(required = false) Integer days,
             @RequestParam(required = false) String applicationName) {
         // Assuming your service has a method to search the vector store
-        String analysis = logService.processLogs(env, query, repoLink, logLevel, days, applicationName);
+        String analysis =
+                logService.processLogs(env, query, repoLink, logLevel, days, applicationName);
         return ResponseEntity.ok(analysis);
     }
 
-    /**
-     * Search and analyze logs from ELK/VectorStore based on a query
-     */
+    /** Search and analyze logs from ELK/VectorStore based on a query */
     @PostMapping("/search-and-analyze-raw")
     public ResponseEntity<String> searchAndAnalyzeRaw(
             @RequestBody String logData,
@@ -43,7 +40,8 @@ public class LogAnalysisController {
             @RequestParam(required = false) Integer days,
             @RequestParam(required = false) String applicationName) {
         // Assuming your service has a method to search the vector store
-        String analysis = logService.processLogs(logData, query, repoLink, logLevel, days, applicationName);
+        String analysis =
+                logService.processLogs(logData, query, repoLink, logLevel, days, applicationName);
         return ResponseEntity.ok(analysis);
     }
 }

@@ -1,7 +1,14 @@
 package com.analyser.loganalyser.service.unit;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.analyser.loganalyser.config.LogProperties;
 import com.analyser.loganalyser.service.LogAnalysisService;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -10,25 +17,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.model.ChatModel;
 
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 @ExtendWith(MockitoExtension.class)
 class LogAnalysisServiceTest {
 
-    @Mock
-    private ChatModel chatModel;
+    @Mock private ChatModel chatModel;
 
-    @Mock
-    private LogProperties logProperties;
+    @Mock private LogProperties logProperties;
 
-    @InjectMocks
-    private LogAnalysisService logAnalysisService;
+    @InjectMocks private LogAnalysisService logAnalysisService;
 
     @Test
     void processLogs_shouldCallChatModelAndReturnResponse() {
@@ -46,7 +42,8 @@ class LogAnalysisServiceTest {
         verify(chatModel).call(promptCaptor.capture());
         assertThat(promptCaptor.getValue()).contains("Identify errors in these logs");
         assertThat(promptCaptor.getValue()).contains(rawLogs);
-        assertThat(promptCaptor.getValue()).contains("Provide the output in a consistent tabular format");
+        assertThat(promptCaptor.getValue())
+                .contains("Provide the output in a consistent tabular format");
     }
 
     @Test
@@ -64,7 +61,8 @@ class LogAnalysisServiceTest {
         assertThat(result).isEqualTo(expectedResponse);
         ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
         verify(chatModel).call(promptCaptor.capture());
-        assertThat(promptCaptor.getValue()).contains("Context repository: https://github.com/example/repo");
+        assertThat(promptCaptor.getValue())
+                .contains("Context repository: https://github.com/example/repo");
     }
 
     @Test
@@ -85,7 +83,7 @@ class LogAnalysisServiceTest {
         // Verify that the mock logs from fetchLogsFromEnv are included
         assertThat(promptCaptor.getValue()).contains("Fetching logs from 'PROD' environment");
     }
-    
+
     @Test
     void processLogs_withEnvAndFilters_shouldIncludeFiltersInMockLogs() {
         // Given
@@ -98,14 +96,15 @@ class LogAnalysisServiceTest {
         when(chatModel.call(anyString())).thenReturn(expectedResponse);
 
         // When
-        String result = logAnalysisService.processLogs(null, null, null, logLevel, days, appName, env);
+        String result =
+                logAnalysisService.processLogs(null, null, null, logLevel, days, appName, env);
 
         // Then
         assertThat(result).isEqualTo(expectedResponse);
         ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
         verify(chatModel).call(promptCaptor.capture());
         String prompt = promptCaptor.getValue();
-        
+
         // Verify filters are passed to the mock log fetcher
         assertThat(prompt).contains("Fetching logs from 'PROD' environment");
         assertThat(prompt).contains("for the last 3 days");

@@ -9,8 +9,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties(LogProperties.class)
 public class LoganalyserApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(LoganalyserApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        SpringApplication.run(LoganalyserApplication.class, args);
+    }
 }
