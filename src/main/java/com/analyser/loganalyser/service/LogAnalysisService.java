@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,8 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 public class LogAnalysisService {
+
+    private static final Logger logger = LoggerFactory.getLogger(LogAnalysisService.class);
 
     private static final int MAX_LOG_LENGTH = 1_000_000;
     private static final int MAX_QUERY_LENGTH = 100_000;
@@ -27,16 +31,13 @@ public class LogAnalysisService {
     private static final String EMAIL_TEMPLATE_FILE = "templates/email-alert.st";
 
     private final ChatModel chatModel;
-    private final String guardrailsContent;
     private final String emailTemplateContent;
-    private final RestTemplate restTemplate;
     private final LogProperties logProperties;
 
     // The starter automatically creates this bean from your yaml settings
     public LogAnalysisService(ChatModel chatModel, LogProperties logProperties) {
         this.chatModel = chatModel;
         this.logProperties = logProperties;
-        this.restTemplate = new RestTemplate();
         String loaded = "";
         try {
             ClassPathResource resource = new ClassPathResource(GUARDRAILS_FILE);
@@ -46,7 +47,6 @@ public class LogAnalysisService {
         } catch (IOException e) {
             System.err.println("Warning: could not load guardrails file: " + e.getMessage());
         }
-        this.guardrailsContent = loaded;
 
         String emailLoaded = "";
         try {
@@ -284,8 +284,7 @@ public class LogAnalysisService {
 
             System.out.println("Analysis output saved to: " + fileName);
         } catch (IOException e) {
-            System.err.println("Error saving output to file: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error saving output to file: {}", e.getMessage(), e);
         }
     }
 }
