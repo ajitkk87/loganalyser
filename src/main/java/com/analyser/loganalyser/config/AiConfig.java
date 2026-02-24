@@ -13,7 +13,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
-import org.springframework.http.HttpHeaders;
 
 @Configuration
 public class AiConfig {
@@ -91,13 +90,7 @@ public class AiConfig {
     @Bean
     @ConditionalOnProperty(name = "ai.provider", havingValue = "openai")
     public OpenAiApi openAiApi(Environment env) {
-        String apiKey = env.getProperty("spring.ai.openai.api-key");
-        if (apiKey == null || apiKey.isBlank()) {
-            apiKey = env.getProperty("OPENAI_API_KEY");
-        }
-        if (apiKey == null || apiKey.isBlank()) {
-            apiKey = env.getProperty("OPEN_API_KEY");
-        }
+        String apiKey = resolveApiKey(env);
 
         String baseUrl = env.getProperty("spring.ai.openai.base-url", "https://api.openai.com");
         String completionsPath =
@@ -105,22 +98,37 @@ public class AiConfig {
         String embeddingsPath =
                 env.getProperty("spring.ai.openai.embedding.embeddings-path", "/v1/embeddings");
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("api-key", apiKey);
-
         logger.info("Configuring OpenAiApi with Base URL: {}", baseUrl);
         logger.info("Configuring OpenAiApi with Embeddings Path: {}", embeddingsPath);
 
-        if (apiKey == null || apiKey.trim().isEmpty()) {
+        if (apiKey == null || apiKey.isBlank()) {
             throw new IllegalStateException("OpenAI API Key is missing");
         }
 
         return OpenAiApi.builder()
                 .baseUrl(baseUrl)
                 .apiKey(apiKey)
-                .headers(headers)
                 .completionsPath(completionsPath)
                 .embeddingsPath(embeddingsPath)
                 .build();
+    }
+
+    private String resolveApiKey(Environment env) {
+        String apiKey = env.getProperty("spring.ai.openai.api-key");
+        if (apiKey == null || apiKey.isBlank()) {
+            apiKey = env.getProperty("OPENAI_API_KEY");
+        }
+        if (apiKey == null || apiKey.isBlank()) {
+            apiKey = env.getProperty("OPEN_API_KEY");
+        }
+        if (apiKey == null) {
+            return null;
+        }
+        String normalized = apiKey.trim();
+        if ((normalized.startsWith("\"") && normalized.endsWith("\""))
+                || (normalized.startsWith("'") && normalized.endsWith("'"))) {
+            normalized = normalized.substring(1, normalized.length() - 1).trim();
+        }
+        return normalized;
     }
 }

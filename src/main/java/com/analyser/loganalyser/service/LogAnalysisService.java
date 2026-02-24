@@ -11,6 +11,7 @@ public class LogAnalysisService {
     private static final int MAX_QUERY_LENGTH = 100_000;
     private final LogAnalysisPromptBuilder promptBuilder;
     private final LogFetcher logFetcher;
+    private final GitRepositoryService gitRepositoryService;
     private final EmailAlertService emailAlertService;
     private final AnalysisOutputStore analysisOutputStore;
     private final PromptTemplateService promptTemplateService;
@@ -20,12 +21,14 @@ public class LogAnalysisService {
             ChatClient chatClient,
             LogAnalysisPromptBuilder promptBuilder,
             LogFetcher logFetcher,
+            GitRepositoryService gitRepositoryService,
             EmailAlertService emailAlertService,
             AnalysisOutputStore analysisOutputStore,
             PromptTemplateService promptTemplateService) {
         this.chatClient = chatClient;
         this.promptBuilder = promptBuilder;
         this.logFetcher = logFetcher;
+        this.gitRepositoryService = gitRepositoryService;
         this.emailAlertService = emailAlertService;
         this.analysisOutputStore = analysisOutputStore;
         this.promptTemplateService = promptTemplateService;
@@ -59,8 +62,19 @@ public class LogAnalysisService {
                     "Query length exceeds the limit of " + MAX_QUERY_LENGTH + " characters.");
         }
 
+        String repoContext = gitRepositoryService.cloneRepositoryIfApplicable(request.repoLink());
+        LogAnalysisRequest promptRequest =
+                new LogAnalysisRequest(
+                        request.rawLogs(),
+                        request.query(),
+                        repoContext,
+                        request.logLevel(),
+                        request.days(),
+                        request.applicationName(),
+                        request.env());
+
         String guardrails = promptTemplateService.guardrailsTemplate();
-        String prompt = promptBuilder.buildAnalysisPrompt(request, logsToProcess);
+        String prompt = promptBuilder.buildAnalysisPrompt(promptRequest, logsToProcess);
         String result =
                 (guardrails != null && !guardrails.isBlank())
                         ? chatClient.prompt().system(guardrails).user(prompt).call().content()

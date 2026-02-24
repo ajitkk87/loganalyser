@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import com.analyser.loganalyser.model.LogAnalysisRequest;
 import com.analyser.loganalyser.service.AnalysisOutputStore;
 import com.analyser.loganalyser.service.EmailAlertService;
+import com.analyser.loganalyser.service.GitRepositoryService;
 import com.analyser.loganalyser.service.LogAnalysisPromptBuilder;
 import com.analyser.loganalyser.service.LogAnalysisService;
 import com.analyser.loganalyser.service.LogFetcher;
@@ -31,6 +32,7 @@ class LogAnalysisServiceTest {
     @Mock private ChatClient.CallResponseSpec callResponseSpec;
     @Mock private LogAnalysisPromptBuilder promptBuilder;
     @Mock private LogFetcher logFetcher;
+    @Mock private GitRepositoryService gitRepositoryService;
     @Mock private EmailAlertService emailAlertService;
     @Mock private AnalysisOutputStore analysisOutputStore;
     @Mock private PromptTemplateService promptTemplateService;
@@ -43,6 +45,7 @@ class LogAnalysisServiceTest {
                         chatClient,
                         promptBuilder,
                         logFetcher,
+                        gitRepositoryService,
                         emailAlertService,
                         analysisOutputStore,
                         promptTemplateService);
@@ -51,6 +54,9 @@ class LogAnalysisServiceTest {
         lenient().when(chatClientRequestSpec.user(anyString())).thenReturn(chatClientRequestSpec);
         lenient().when(chatClientRequestSpec.call()).thenReturn(callResponseSpec);
         lenient().when(callResponseSpec.content()).thenReturn("ok");
+        lenient()
+                .when(gitRepositoryService.cloneRepositoryIfApplicable(any()))
+                .thenAnswer(i -> i.getArgument(0));
     }
 
     @Test
@@ -87,7 +93,12 @@ class LogAnalysisServiceTest {
         String repoLink = "https://github.com/example/repo";
         String expectedResponse = "Analysis with repo context.";
         when(promptBuilder.buildAnalysisPrompt(any(), anyString()))
-                .thenReturn("Context repository: https://github.com/example/repo");
+                .thenAnswer(
+                        i ->
+                                "Context repository: "
+                                        + i.getArgument(0, LogAnalysisRequest.class).repoLink());
+        when(gitRepositoryService.cloneRepositoryIfApplicable(repoLink))
+                .thenReturn(repoLink + " (cloned to D:\\temp\\repo)");
         when(promptTemplateService.guardrailsTemplate()).thenReturn("");
         when(callResponseSpec.content()).thenReturn(expectedResponse);
 
@@ -101,7 +112,8 @@ class LogAnalysisServiceTest {
         ArgumentCaptor<String> promptCaptor = ArgumentCaptor.forClass(String.class);
         verify(chatClientRequestSpec).user(promptCaptor.capture());
         assertThat(promptCaptor.getValue())
-                .contains("Context repository: https://github.com/example/repo");
+                .contains(
+                        "Context repository: https://github.com/example/repo (cloned to D:\\temp\\repo)");
     }
 
     @Test
