@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.analyser.loganalyser.model.LogAnalysisRequest;
 import com.analyser.loganalyser.model.agent.AgentCard;
 import com.analyser.loganalyser.model.agent.AgentInvokeRequest;
 import com.analyser.loganalyser.model.agent.AgentInvokeResponse;
 import com.analyser.loganalyser.service.LogAnalysisService;
 import org.junit.jupiter.api.Test;
+
 class AgentControllerTest {
 
     private final LogAnalysisService logAnalysisService =
@@ -26,15 +28,16 @@ class AgentControllerTest {
 
     @Test
     void analyze_shouldDelegateToServiceAndReturnAnalysis() {
-        when(logAnalysisService.processLogs(
+        LogAnalysisRequest logRequest =
+                new LogAnalysisRequest(
                         "ERROR: timeout",
                         "Find root cause",
                         "https://example.com/repo",
                         "ERROR",
                         2,
                         "payments",
-                        "test"))
-                .thenReturn("Analysis complete");
+                        "test");
+        when(logAnalysisService.processLogs(logRequest)).thenReturn("Analysis complete");
 
         AgentInvokeRequest request =
                 new AgentInvokeRequest(
@@ -49,14 +52,6 @@ class AgentControllerTest {
         assertThat(response).isNotNull();
         assertThat(response.analysis()).isEqualTo("Analysis complete");
 
-        verify(logAnalysisService)
-                .processLogs(
-                        "ERROR: timeout",
-                        "Find root cause",
-                        "https://example.com/repo",
-                        "ERROR",
-                        2,
-                        "payments",
-                        "test");
+        verify(logAnalysisService).processLogs(logRequest);
     }
 }

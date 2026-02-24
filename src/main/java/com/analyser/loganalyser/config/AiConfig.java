@@ -1,16 +1,23 @@
 package com.analyser.loganalyser.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatModel;
+import org.springframework.ai.openai.api.OpenAiApi;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
 
 @Configuration
 public class AiConfig {
+    private static final Logger logger = LoggerFactory.getLogger(AiConfig.class);
 
     /**
      * Primary bean selector for a {@link ChatModel} implementation.
@@ -74,5 +81,46 @@ public class AiConfig {
                 "ChatModel '"
                         + providerPref
                         + "' is not available. Ensure the corresponding starter is on the classpath and properties are configured.");
+    }
+
+    @Bean
+    public ChatClient chatClient(ChatModel chatModel) {
+        return ChatClient.create(chatModel);
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "ai.provider", havingValue = "openai")
+    public OpenAiApi openAiApi(Environment env) {
+        String apiKey = env.getProperty("spring.ai.openai.api-key");
+        if (apiKey == null || apiKey.isBlank()) {
+            apiKey = env.getProperty("OPENAI_API_KEY");
+        }
+        if (apiKey == null || apiKey.isBlank()) {
+            apiKey = env.getProperty("OPEN_API_KEY");
+        }
+
+        String baseUrl = env.getProperty("spring.ai.openai.base-url", "https://api.openai.com");
+        String completionsPath =
+                env.getProperty("spring.ai.openai.chat.completions-path", "/v1/chat/completions");
+        String embeddingsPath =
+                env.getProperty("spring.ai.openai.embedding.embeddings-path", "/v1/embeddings");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("api-key", apiKey);
+
+        logger.info("Configuring OpenAiApi with Base URL: {}", baseUrl);
+        logger.info("Configuring OpenAiApi with Embeddings Path: {}", embeddingsPath);
+
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            throw new IllegalStateException("OpenAI API Key is missing");
+        }
+
+        return OpenAiApi.builder()
+                .baseUrl(baseUrl)
+                .apiKey(apiKey)
+                .headers(headers)
+                .completionsPath(completionsPath)
+                .embeddingsPath(embeddingsPath)
+                .build();
     }
 }

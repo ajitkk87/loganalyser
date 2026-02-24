@@ -3,6 +3,7 @@ package com.analyser.loganalyser.service.integration;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.analyser.loganalyser.config.LogProperties;
+import com.analyser.loganalyser.model.LogAnalysisRequest;
 import com.analyser.loganalyser.service.LogAnalysisService;
 import com.analyser.loganalyser.util.LogStreamGenerator;
 import java.util.stream.Collectors;
@@ -20,6 +21,11 @@ class LogAnalysisServiceStreamLogsTest {
 
     @Test
     void processLogs_shouldAnalyzeGeneratedLogsWithRealModel() {
+        if (!hasRealApiKey()) {
+            System.out.println("Skipping integration test: real OpenAI key not configured");
+            return;
+        }
+
         // Given
         // Generate 10 log lines using the LogStreamGenerator
         String rawLogs =
@@ -41,6 +47,11 @@ class LogAnalysisServiceStreamLogsTest {
 
     @Test
     void processLogs_shouldAnalyzeGeneratedLogsWithFiltersWithRealModel() {
+        if (!hasRealApiKey()) {
+            System.out.println("Skipping integration test: real OpenAI key not configured");
+            return;
+        }
+
         // Given
         String rawLogs =
                 IntStream.range(0, 30)
@@ -52,10 +63,20 @@ class LogAnalysisServiceStreamLogsTest {
         String promptQuery = "Find Most Frequent ERROR);";
 
         // When
-        String result = logAnalysisService.processLogs(rawLogs, promptQuery);
+        String result =
+                logAnalysisService.processLogs(
+                        new LogAnalysisRequest(rawLogs, promptQuery, null, null, null, null, null));
 
         // Then
         System.out.println("LLM Response (Filtered):\n" + result);
         assertThat(result).isNotBlank();
+    }
+
+    private boolean hasRealApiKey() {
+        String key = System.getenv("OPENAI_API_KEY");
+        if (key == null || key.isBlank()) {
+            key = System.getenv("OPEN_API_KEY");
+        }
+        return key != null && !key.isBlank() && !"test-key".equals(key);
     }
 }

@@ -12,7 +12,7 @@
 	<artifactId>loganalyser</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>loganalyser</name>
-	<description>Demo project for Spring Boot</description>
+	<description>Log Analyzer Service</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -30,10 +30,11 @@
 		<java.version>25</java.version>
 		<spring-ai.version>2.0.0-M2</spring-ai.version>
 		<spotless.version>3.0.0</spotless.version>
-		<pmd.version>3.25.0</pmd.version>
+		<pmd.version>3.28.0</pmd.version>
 		<checkstyle.version>3.4.0</checkstyle.version>
 		<google-java-format.version>1.22.0</google-java-format.version>
 		<maven-clean-plugin.version>3.1.0</maven-clean-plugin.version>
+		<pmd.skip>false</pmd.skip>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -135,6 +136,8 @@
 				</configuration>
 				<executions>
 					<execution>
+						<id>spotless-apply</id>
+						<phase>validate</phase>
 						<goals>
 							<goal>apply</goal>
 						</goals>
@@ -146,11 +149,18 @@
 				<artifactId>maven-pmd-plugin</artifactId>
 				<version>${pmd.version}</version>
 				<configuration>
+					<skip>${pmd.skip}</skip>
+					<jdkToolchain>
+						<version>21</version>
+					</jdkToolchain>
+					<typeResolution>false</typeResolution>
 					<rulesets>
 						<ruleset>category/java/bestpractices.xml</ruleset>
 					</rulesets>
 					<targetDirectory>${project.build.directory}/pmd</targetDirectory>
 					<outputDirectory>${project.build.directory}/pmd</outputDirectory>
+					<printFailingErrors>true</printFailingErrors>
+					<verbose>true</verbose>
 				</configuration>
 				<executions>
 					<execution>

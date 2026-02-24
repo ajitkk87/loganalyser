@@ -1,5 +1,6 @@
 package com.analyser.loganalyser.controller;
 
+import com.analyser.loganalyser.model.LogAnalysisRequest;
 import com.analyser.loganalyser.model.agent.AgentCard;
 import com.analyser.loganalyser.model.agent.AgentInvokeRequest;
 import com.analyser.loganalyser.model.agent.AgentInvokeResponse;
@@ -36,13 +37,14 @@ public class AgentController {
     public ResponseEntity<AgentInvokeResponse> analyze(@RequestBody AgentInvokeRequest request) {
         String analysis =
                 logAnalysisService.processLogs(
-                        request.logs(),
-                        request.query(),
-                        request.repoLink(),
-                        request.logLevel(),
-                        request.days(),
-                        request.applicationName(),
-                        request.environment());
+                        new LogAnalysisRequest(
+                                request.logs(),
+                                request.query(),
+                                request.repoLink(),
+                                request.logLevel(),
+                                request.days(),
+                                request.applicationName(),
+                                request.environment()));
         return ResponseEntity.ok(new AgentInvokeResponse(analysis));
     }
 

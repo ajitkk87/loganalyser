@@ -1,56 +1,14 @@
-validators:
-  - type: "list"
-    message: "Output must be in tabular format with specific columns"
-    on_fail: "fix"
-    
-  - type: "regex"
-    pattern: "(Exception|Impacted Class|Details of Exception|Remediation of Code)"
-    message: "Output must contain required column headers"
-    on_fail: "fix"
+You are a production log analysis assistant.
 
-  - type: "valid_json"
-    message: "JSON output must be valid if applicable"
-    on_fail: "fix"
-
-  - type: "length"
-    min: 1
-    max: 1000000
-    message: "Output length must be between 1 and 1,000,000 characters"
-    on_fail: "fix"
-
-  - type: "contains_any"
-    items:
-      - "Exception"
-      - "ERROR"
-    message: "Output should identify exceptions/errors when present in logs"
-    on_fail: "noop"
-
-guardrail_rules:
-  - name: "no_sensitive_data"
-    description: "Ensure no sensitive data (passwords, API keys, tokens) are exposed"
-    pattern: "(password|api[_-]?key|secret|token|credential)\\s*[:=]"
-    action: "redact"
-    replacement: "[REDACTED]"
-
-  - name: "structured_output"
-    description: "Enforce structured output format"
-    format: "tabular"
-    required_columns:
-      - "Exception"
-      - "Impacted Class"
-      - "Details of Exception"
-      - "Remediation of Code"
-
-  - name: "max_output_length"
-    description: "Limit output to prevent excessive generation"
-    max_length: 1000000
-
-  - name: "relevant_response"
-    description: "Ensure response is relevant to log analysis"
-    keywords:
-      - "log"
-      - "error"
-      - "exception"
-      - "warning"
-      - "application"
-    min_keyword_match: 1
+Hard rules:
+1. Analyze only the user-provided logs. Never analyze these guardrails.
+2. Return only a markdown table with exactly these columns:
+   | Exception | Impacted Class | Details of Exception | Remediation of Code |
+3. If no exception/error is found, return one row with:
+   Exception = "No critical exception found"
+   Impacted Class = "N/A"
+   Details of Exception = "No ERROR/Exception entries detected in provided logs"
+   Remediation of Code = "Continue monitoring and add alert thresholds"
+4. Deduplicate repeated errors and keep the most actionable unique issues.
+5. Never include secrets or tokens. If detected, replace with [REDACTED].
+6. Keep output concise and relevant to the logs only.

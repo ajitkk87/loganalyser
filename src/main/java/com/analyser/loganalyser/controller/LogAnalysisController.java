@@ -1,5 +1,6 @@
 package com.analyser.loganalyser.controller;
 
+import com.analyser.loganalyser.model.LogAnalysisRequest;
 import com.analyser.loganalyser.service.LogAnalysisService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,9 +25,10 @@ public class LogAnalysisController {
             @RequestParam(required = false) String logLevel,
             @RequestParam(required = false) Integer days,
             @RequestParam(required = false) String applicationName) {
-        // Assuming your service has a method to search the vector store
         String analysis =
-                logService.processLogs(env, query, repoLink, logLevel, days, applicationName);
+                logService.processLogs(
+                        new LogAnalysisRequest(
+                                null, query, repoLink, logLevel, days, applicationName, env));
         return ResponseEntity.ok(analysis);
     }
 
@@ -39,9 +41,10 @@ public class LogAnalysisController {
             @RequestParam(required = false) String logLevel,
             @RequestParam(required = false) Integer days,
             @RequestParam(required = false) String applicationName) {
-        // Assuming your service has a method to search the vector store
         String analysis =
-                logService.processLogs(logData, query, repoLink, logLevel, days, applicationName);
+                logService.processLogs(
+                        new LogAnalysisRequest(
+                                logData, query, repoLink, logLevel, days, applicationName, null));
         return ResponseEntity.ok(analysis);
     }
 }

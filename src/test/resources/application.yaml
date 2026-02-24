@@ -1,9 +1,12 @@
+ai:
+   provider: openai
 spring:
   application:
     name: loganalyser
+  config:
+    import: "optional:file:.env[.properties]"
   ai:
     # preferred provider for ChatModel selection in AiConfig: 'ollama', 'google' or 'openai'
-    provider: openai
     ollama:
       base-url: http://localhost:11434
       chat:
@@ -16,7 +19,7 @@ spring:
         options:
           model: gemini-1.5-flash
     openai:
-      api-key: ${OPEN_API_KEY}
+      api-key: ${OPENAI_API_KEY:${OPEN_API_KEY:test-key}}
       base-url: https://aicafe.hcl.com/AICafeService/api/v1/subscription
       chat:
         enabled: true
@@ -24,12 +27,12 @@ spring:
         options:
           model: gpt-4.1
           http-headers:
-            api-key: ${OPEN_API_KEY}
+            api-key: ${OPENAI_API_KEY:${OPEN_API_KEY:test-key}}
       retry:
         max-attempts: 3
       hcl:
         cafe:
-          api-key: ${OPEN_API_KEY}
+          api-key: ${OPENAI_API_KEY:${OPEN_API_KEY:test-key}}
           endpoint: https://aicafe.hcl.com/AICafeService/api/v1/subscription/openai/deployments/
           api-version: 2024-12-01-preview
           model: gpt-4.1

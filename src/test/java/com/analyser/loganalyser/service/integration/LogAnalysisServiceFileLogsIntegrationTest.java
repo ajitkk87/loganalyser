@@ -18,6 +18,11 @@ class LogAnalysisServiceFileLogsIntegrationTest {
 
     @Test
     void processLogs_shouldCallRealChatModel() throws IOException {
+        if (!hasRealApiKey()) {
+            System.out.println("Skipping integration test: real OpenAI key not configured");
+            return;
+        }
+
         // Given
         Path path = new ClassPathResource("dummy.log").getFile().toPath();
         String rawLogs = Files.readString(path);
@@ -28,5 +33,13 @@ class LogAnalysisServiceFileLogsIntegrationTest {
         // Then
         System.out.println("LLM Response: " + result);
         assertThat(result).isNotBlank();
+    }
+
+    private boolean hasRealApiKey() {
+        String key = System.getenv("OPENAI_API_KEY");
+        if (key == null || key.isBlank()) {
+            key = System.getenv("OPEN_API_KEY");
+        }
+        return key != null && !key.isBlank() && !"test-key".equals(key);
     }
 }
