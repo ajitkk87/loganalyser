@@ -18,7 +18,7 @@ public class GitRepositoryService {
     private final Path repoBaseDir;
 
     public GitRepositoryService(
-            @Value("${app.repo-clone.base-dir:output/cloned-repos}") String repoBaseDir) {
+            @Value("${app.repo-clone.base-dir:target/cloned-repos}") String repoBaseDir) {
         this.repoBaseDir = Paths.get(repoBaseDir).toAbsolutePath().normalize();
     }
 

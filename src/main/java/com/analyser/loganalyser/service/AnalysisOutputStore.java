@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 public class AnalysisOutputStore {
 
     private static final Logger logger = LoggerFactory.getLogger(AnalysisOutputStore.class);
-    private static final String LOG_OUTPUT_DIR = "output/log_analysis_output";
+    private static final String LOG_OUTPUT_DIR = "target/log_analysis_output";
 
     public void save(String output) {
         try {

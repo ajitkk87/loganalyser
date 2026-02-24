@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class EmailAlertService {
 
     private static final Logger logger = LoggerFactory.getLogger(EmailAlertService.class);
-    private static final String EMAIL_OUTPUT_DIR = "output/email";
+    private static final String EMAIL_OUTPUT_DIR = "target/email";
 
     public void sendEmailAlert(String subject, String body) {
         logger.info("Sending email alert with subject: {}", subject);

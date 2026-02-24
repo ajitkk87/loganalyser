@@ -114,7 +114,13 @@
 				<configuration>
 					<filesets>
 						<fileset>
-							<directory>output</directory>
+							<directory>${project.build.directory}/log_analysis_output</directory>
+						</fileset>
+						<fileset>
+							<directory>${project.build.directory}/email</directory>
+						</fileset>
+						<fileset>
+							<directory>${project.build.directory}/cloned-repos</directory>
 						</fileset>
 					</filesets>
 				</configuration>

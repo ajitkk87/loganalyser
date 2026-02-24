@@ -6,7 +6,7 @@ spring:
   application:
     name: loganalyser
   config:
-    import: "optional:file:.env[.properties]"
+    import: "optional:classpath:/.env[.properties]"
   ai:
     # preferred provider for ChatModel selection in AiConfig: 'ollama', 'google' or 'openai'
     ollama:

@@ -10,7 +10,7 @@ This document outlines the current features of the Log Analyser application and 
 - **External Log Fetching:** The application can fetch logs from different environments (dev, test, acc, prd) based on URLs configured in `application.yaml`.
 - **Configuration-Driven:** Environment-specific settings, such as log URLs and AI provider details, are managed through the `application.yaml` file using `@ConfigurationProperties`.
 - **Mock Log Generation:** A utility class (`LogStreamGenerator`) is available to generate realistic, dynamic log data for testing purposes.
-- **Output Storage:** The analysis results and generated email alerts are saved to the local file system in the `output` directory.
+- **Output Storage:** The analysis results and generated email alerts are saved to the local file system in the `target` directory.
 
 ## Future Enhancements
 
