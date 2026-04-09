@@ -9,12 +9,14 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.core.io.ClassPathResource;
 
 @SpringBootTest
 class LogAnalysisServiceFileLogsIntegrationTest {
 
     @Autowired private LogAnalysisService logAnalysisService;
+    @Autowired private Environment environment;
 
     @Test
     void processLogs_shouldCallRealChatModel() throws IOException {
@@ -36,9 +38,9 @@ class LogAnalysisServiceFileLogsIntegrationTest {
     }
 
     private boolean hasRealApiKey() {
-        String key = System.getenv("OPENAI_API_KEY");
+        String key = environment.getProperty("OPENAI_API_KEY");
         if (key == null || key.isBlank()) {
-            key = System.getenv("OPEN_API_KEY");
+            key = environment.getProperty("OPEN_API_KEY");
         }
         return key != null && !key.isBlank() && !"test-key".equals(key);
     }
